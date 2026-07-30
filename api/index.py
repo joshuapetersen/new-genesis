@@ -6,7 +6,7 @@ import hmac
 import hashlib
 import requests as sync_requests
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 import google.generativeai as genai
 
@@ -60,6 +60,19 @@ def verify_circle_payment(tx_hash: str, required_amount: float, expected_token: 
     except Exception as e:
         _log(f"[x402] Payment verification failed: {e}")
     return False
+
+@app.get('/', response_class=HTMLResponse)
+async def root():
+    """Serve the main landing page with Vercel Web Analytics"""
+    html_path = os.path.join(os.path.dirname(__file__), '..', 'templates', 'index.html')
+    try:
+        with open(html_path, 'r', encoding='utf-8') as f:
+            return f.read()
+    except FileNotFoundError:
+        return HTMLResponse(
+            content="<h1>NEW GENESIS</h1><p>Sovereign Cloud Surrogate is ONLINE</p>",
+            status_code=200
+        )
 
 @app.post('/v1/x402/theorylab')
 async def premium_theorylab(request: Request):
