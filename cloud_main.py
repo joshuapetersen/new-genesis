@@ -6,7 +6,7 @@ import hmac
 import hashlib
 import requests as sync_requests
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 import google.generativeai as genai
 
@@ -112,6 +112,141 @@ async def premium_theorylab(request: Request):
         "tx_hash": tx_hash,
         "result": {"answer": result_text, "engine": "gemini-cloud-surrogate"}
     }
+
+LANDING_PAGE_HTML = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S.A.R.A.H. Cloud Surrogate</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap');
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #050505;
+            color: #e0e0e0;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            background: radial-gradient(circle at center, #1a1a2e 0%, #050505 100%);
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.1);
+            animation: fadeIn 2s ease-out;
+            max-width: 600px;
+            width: 90%;
+        }
+        h1 {
+            font-weight: 700;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00d2ff 0%, #3a7bd5 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 2px;
+        }
+        h2 {
+            font-weight: 300;
+            font-size: 1.2em;
+            color: #a0a0a0;
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+        }
+        .status-badge {
+            display: inline-block;
+            background: rgba(0, 255, 0, 0.1);
+            color: #00ff00;
+            padding: 8px 16px;
+            border-radius: 50px;
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            font-size: 0.9em;
+            font-weight: bold;
+            margin-bottom: 30px;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.2);
+            animation: pulse 2s infinite;
+        }
+        .endpoint-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 10px 0;
+            text-align: left;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .endpoint-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 255, 255, 0.1);
+            border-color: rgba(0, 255, 255, 0.3);
+        }
+        .endpoint-title {
+            color: #00d2ff;
+            font-family: monospace;
+            font-size: 1.1em;
+            margin-bottom: 8px;
+        }
+        .endpoint-desc {
+            font-size: 0.9em;
+            color: #888;
+            line-height: 1.4;
+        }
+        .gate-price {
+            margin-top: 10px;
+            font-size: 0.85em;
+            color: #ff007a;
+            font-weight: bold;
+            display: inline-block;
+            background: rgba(255, 0, 122, 0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(0, 255, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>S.A.R.A.H.</h1>
+        <h2>Sovereign Cloud Surrogate</h2>
+        <div class="status-badge">● NODE ONLINE</div>
+        
+        <div class="endpoint-card">
+            <div class="endpoint-title">GET /status</div>
+            <div class="endpoint-desc">Public telemetry endpoint. Emits current node state and x402 gateway readiness.</div>
+        </div>
+        
+        <div class="endpoint-card">
+            <div class="endpoint-title">POST /v1/x402/theorylab</div>
+            <div class="endpoint-desc">Cognitive inference interface. Protected by cryptographic on-chain verification.</div>
+            <div class="gate-price">x402 GATE: 0.133 USDC REQUIRED</div>
+        </div>
+    </div>
+</body>
+</html>
+"""
+
+@app.get("/")
+def read_root():
+    return HTMLResponse(content=LANDING_PAGE_HTML)
 
 @app.get('/status')
 def status():
