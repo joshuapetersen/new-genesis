@@ -1,0 +1,16 @@
+{
+  "name": "new-genesis",
+  "version": "1.0.0",
+  "description": "A sovereign AI operating system with cloud surrogate API",
+  "private": true,
+  "scripts": {
+    "postinstall": "echo 'Dependencies installed successfully'"
+  },
+  "dependencies": {
+    "@vercel/analytics": "^1.4.1"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
